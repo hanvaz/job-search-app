@@ -1,0 +1,202 @@
+<!-- HTML Example for testing -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Search - Tìm Việc Làm Cho Sinh Viên</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 3rem 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.95;
+        }
+
+        main {
+            padding: 2rem 1rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 0.75rem;
+            color: #3b82f6;
+        }
+
+        .setup-steps {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .setup-steps h2 {
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+        }
+
+        .step {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .step::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #3b82f6;
+            color: white;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            color: #1f2937;
+        }
+
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.875rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>💼 Job Search for Students</h1>
+            <p class="hero-subtitle">Ứng dụng tìm việc làm cho sinh viên</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="features">
+                <div class="feature-card">
+                    <h3>🔍 Tìm Kiếm</h3>
+                    <p>Tìm kiếm công việc theo tên, công ty hoặc mô tả chi tiết.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🌍 Lọc Theo Địa Điểm</h3>
+                    <p>Lọc công việc theo địa điểm: Hà Nội, Hồ Chí Minh, Đà Nẵng, Remote.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💼 Loại Hình Công Việc</h3>
+                    <p>Lọc theo loại hình: Thực tập, Bán thời gian, Toàn thời gian, Remote.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>❤️ Lưu Yêu Thích</h3>
+                    <p>Lưu các công việc yêu thích để xem lại sau này.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📋 Chi Tiết Công Việc</h3>
+                    <p>Xem đầy đủ mô tả, yêu cầu, và quyền lợi của từng vị trí.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📱 Responsive Design</h3>
+                    <p>Sử dụng được trên mobile, tablet, và desktop.</p>
+                </div>
+            </section>
+
+            <section class="setup-steps">
+                <h2>🚀 Hướng Dẫn Cài Đặt và Chạy</h2>
+
+                <div class="step" data-step="1">
+                    <strong>Cài đặt Node.js</strong>
+                    <p>Tải Node.js từ <code>https://nodejs.org</code></p>
+                </div>
+
+                <div class="step" data-step="2">
+                    <strong>Cài đặt Dependencies</strong>
+                    <pre><code>npm install</code></pre>
+                </div>
+
+                <div class="step" data-step="3">
+                    <strong>Chạy Backend</strong>
+                    <pre><code>npm run server</code></pre>
+                    <p>Server sẽ chạy trên <code>http://localhost:3000</code></p>
+                </div>
+
+                <div class="step" data-step="4">
+                    <strong>Chạy Frontend (Terminal mới)</strong>
+                    <pre><code>npm run dev</code></pre>
+                    <p>Frontend sẽ chạy trên <code>http://localhost:5173</code></p>
+                </div>
+
+                <div class="step" data-step="5">
+                    <strong>Hoặc Chạy Cùng Lúc</strong>
+                    <pre><code>npm run dev:full</code></pre>
+                    <p>Cả backend và frontend sẽ chạy cùng một lúc</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Job Search for Students. All rights reserved.</p>
+    </footer>
+</body>
+</html>
