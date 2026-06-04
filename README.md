@@ -1,8 +1,8 @@
 # Job Search for Students
 
-Ứng dụng fullstack tìm việc làm cho sinh viên frontend intern. Ứng dụng giúp sinh viên tìm kiếm các cơ hội việc làm phù hợp, lọc theo địa điểm, loại hình công việc, và lưu các công việc yêu thích.
+Web tìm việc làm cho sinh viên. Ứng dụng giúp sinh viên tìm kiếm các cơ hội việc làm phù hợp, lọc theo địa điểm, loại hình công việc, và lưu các công việc yêu thích.
 
-## 📋 Tính năng
+## Tính năng
 
 - ✅ Tìm kiếm công việc theo tên, công ty
 - ✅ Lọc theo địa điểm (Hà Nội, Hồ Chí Minh, Đà Nẵng, Remote)
@@ -14,7 +14,7 @@
 - ✅ Caching và API filtering
 - ✅ Dark mode ready
 
-## 🛠️ Công nghệ sử dụng
+## Công nghệ sử dụng
 
 ### Frontend
 - React 18.3.1
@@ -28,9 +28,8 @@
 - CORS
 - RESTful API
 
-## 📁 Cấu trúc thư mục
+## Cấu trúc thư mục
 
-```
 Job/
 ├── public/                  # Static files
 ├── src/
@@ -61,7 +60,7 @@ Job/
 
 ```
 
-## 🚀 Cài đặt và chạy dự án
+## Cài đặt và chạy dự án
 
 ### Yêu cầu
 - Node.js 14+ (https://nodejs.org)
@@ -106,7 +105,7 @@ npm run build
 npm run preview
 ```
 
-## 📡 API Documentation
+## API Documentation
 
 ### Base URL
 ```
@@ -168,7 +167,7 @@ Body: { location?: string, type?: string }
 Response: Array<Job>
 ```
 
-## 📊 Cấu trúc dữ liệu Job
+## Cấu trúc dữ liệu Job
 
 ```javascript
 {
@@ -183,7 +182,7 @@ Response: Array<Job>
 }
 ```
 
-## 💾 localStorage
+## localStorage
 
 ### Favorites
 ```javascript
@@ -200,7 +199,7 @@ localStorage.setItem('favorites', JSON.stringify([1, 2, 3]))
 const favorites = JSON.parse(localStorage.getItem('favorites')) || []
 ```
 
-## 🎨 Màu sắc và Theme
+## Màu sắc và Theme
 
 ```css
 --primary-color: #3b82f6          /* Xanh dương */
@@ -212,16 +211,15 @@ const favorites = JSON.parse(localStorage.getItem('favorites')) || []
 --text-light: #6b7280             /* Chữ xám */
 --bg-light: #f9fafb               /* Nền nhạt */
 --bg-white: #ffffff               /* Nền trắng */
-```
 
-## 📱 Responsive Design
+## Responsive Design
 
 Ứng dụng được thiết kế responsive cho tất cả kích thước màn hình:
 - **Mobile**: < 480px
 - **Tablet**: 480px - 768px
 - **Desktop**: > 768px
 
-## 🔄 Workflow Phát triển
+## Workflow Phát triển
 
 1. **Backend Development**
    ```bash
@@ -243,60 +241,7 @@ const favorites = JSON.parse(localStorage.getItem('favorites')) || []
    ```
    - Frontend + Backend chạy cùng lúc
    - Frontend proxy requests đến backend
-
-## 🐛 Troubleshooting
-
-### Port đã được sử dụng
-```bash
-# Thay đổi port backend trong server.js
-const port = 3001;
-
-# Hoặc sử dụng environment variable
-PORT=3001 npm run server
-```
-
-### CORS Error
-Đảm bảo backend đã enable CORS:
-```javascript
-app.use(cors());
-```
-
-### Module not found
-```bash
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-```
-
-## 📝 Các file quan trọng
-
-| File | Mô tả |
-|------|-------|
-| `src/App.jsx` | Main component |
-| `server.js` | Backend server |
-| `vite.config.js` | Vite configuration |
-| `src/styles.css` | Global styles |
-| `package.json` | Dependencies & scripts |
-
-## 🚀 Deployment
-
-### Deploy Frontend (Netlify/Vercel)
-1. Build: `npm run build`
-2. Deploy `dist/` folder
-
-### Deploy Backend (Heroku/Railway)
-1. Add Procfile
-2. Push to git
-3. Deploy
-
-## 📚 Tài liệu tham khảo
-
-- [React Documentation](https://react.dev)
-- [Vite Documentation](https://vitejs.dev)
-- [Express Documentation](https://expressjs.com)
-- [MDN Web Docs](https://developer.mozilla.org)
-
-## 👨‍💻 Các bước tiếp theo
+## Các bước tiếp theo
 
 - [ ] Thêm database (MongoDB/PostgreSQL)
 - [ ] Authentication (Login/Register)
@@ -305,18 +250,3 @@ npm install
 - [ ] Email notifications
 - [ ] Advanced filtering
 - [ ] Admin dashboard
-
-## 📄 Giấy phép
-
-MIT License
-
-## 📧 Liên hệ
-
-Nếu có câu hỏi hoặc đề xuất, vui lòng liên hệ qua email.
-
----
-
-Happy coding! 🎉
-
-- `GET /api/jobs` - lấy danh sách việc làm
-- `GET /api/jobs/:id` - lấy chi tiết một công việc
