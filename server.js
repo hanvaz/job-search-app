@@ -66,6 +66,21 @@ async function fetchJobsFromRemotive() {
     
     console.log(`✅ Successfully fetched ${jobs.length} jobs from Remotive API`);
     
+    // Helper function to strip HTML tags and decode entities
+    const stripHTML = (html) => {
+      if (!html) return 'No description available';
+      return html
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .trim()
+        .substring(0, 500); // Limit to 500 chars
+    };
+    
     // Transform Remotive jobs to our format
     const transformedJobs = jobs.slice(0, 30).map((job, index) => ({
       id: index + 1,
@@ -73,7 +88,7 @@ async function fetchJobsFromRemotive() {
       company: job.company_name || 'Unknown Company',
       location: 'Remote',
       type: 'Remote',
-      description: job.description || job.job_apply_link || 'No description available',
+      description: stripHTML(job.description),
       requirements: 'See job description for details',
       benefits: job.salary || 'Salary not specified',
     }));
