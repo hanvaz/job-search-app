@@ -8,12 +8,13 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// CORS Configuration - Allow specific origins for Vercel + Render split deployment
+// CORS Configuration
 const corsOptions = {
   origin: [
     'http://localhost:3000',
     'http://localhost:5173',
     'https://job-search-app.vercel.app',
+    'https://job-search-app-murex-three.vercel.app',
   ],
   credentials: true
 };
