@@ -5,6 +5,9 @@ import JobList from './components/JobList';
 import JobDetail from './components/JobDetail';
 import FavoritesTab from './components/FavoritesTab';
 
+// API Configuration - supports both local dev and deployed backend
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const locations = ['Tất cả', 'Hà Nội', 'Hồ Chí Minh', 'Đà Nẵng', 'Remote'];
 const types = ['Tất cả', 'Thực tập', 'Bán thời gian', 'Remote'];
 
@@ -32,7 +35,7 @@ export default function App() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('/api/jobs');
+        const response = await fetch(`${API_URL}/api/jobs`);
         if (!response.ok) {
           throw new Error('Lỗi tải dữ liệu từ server');
         }
