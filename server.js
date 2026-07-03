@@ -22,7 +22,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-const jobs = [
+// Fallback jobs data (used when API fails)
+const fallbackJobs = [
   {
     id: 1,
     title: 'Frontend Intern',
@@ -43,87 +44,82 @@ const jobs = [
     requirements: 'Kiến thức về Figma hoặc Adobe XD. Có portfolio thiết kế là lợi thế.',
     benefits: 'Mức lương: 6-9 triệu VND/tháng. Cơ hội làm việc trên các dự án thực tế.',
   },
-  {
-    id: 3,
-    title: 'Junior Frontend Developer',
-    company: 'EduNext',
-    location: 'Đà Nẵng',
-    type: 'Bán thời gian',
-    description: 'Tham gia phát triển giao diện website học tập trực tuyến bằng React.',
-    requirements: 'Hiểu rõ về React, JavaScript ES6+. Kinh nghiệm với REST API.',
-    benefits: 'Mức lương: 15-20 triệu VND/tháng. Cơ hội full-time sau thử việc.',
-  },
-  {
-    id: 4,
-    title: 'Web Developer Intern',
-    company: 'StartUp VN',
-    location: 'Remote',
-    type: 'Remote',
-    description: 'Xây dựng trang web marketing và cải thiện hiệu suất front-end.',
-    requirements: 'Kiến thức React, HTML/CSS/JavaScript. Khả năng làm việc độc lập.',
-    benefits: 'Mức lương: 8-12 triệu VND/tháng. Làm việc từ xa, linh hoạt giờ làm.',
-  },
-  {
-    id: 5,
-    title: 'Backend Intern (Node.js)',
-    company: 'CloudTech',
-    location: 'Hà Nội',
-    type: 'Thực tập',
-    description: 'Phát triển API backend sử dụng Node.js và Express. Làm việc với cơ sở dữ liệu MongoDB.',
-    requirements: 'Kiến thức JavaScript, Node.js, Express. Hiểu biết về RESTful API.',
-    benefits: 'Mức lương: 7-10 triệu VND/tháng. Mentorship từ các backend engineers.',
-  },
-  {
-    id: 6,
-    title: 'Fullstack Developer',
-    company: 'InnovateLabs',
-    location: 'Hồ Chí Minh',
-    type: 'Bán thời gian',
-    description: 'Phát triển các ứng dụng web fullstack sử dụng MERN stack.',
-    requirements: 'React, Node.js/Express, MongoDB. Hiểu biết về deployment.',
-    benefits: 'Mức lương: 20-28 triệu VND/tháng. Cơ hội nâng cao kỹ năng fullstack.',
-  },
-  {
-    id: 7,
-    title: 'Junior QA Engineer',
-    company: 'TestHub',
-    location: 'Remote',
-    type: 'Remote',
-    description: 'Thực hiện kiểm thử tự động và thủ công cho ứng dụng web.',
-    requirements: 'Kiến thức về Selenium, JUnit. Kỹ năng viết test cases.',
-    benefits: 'Mức lương: 10-14 triệu VND/tháng. Học tập về automation testing.',
-  },
-  {
-    id: 8,
-    title: 'Data Analyst Intern',
-    company: 'Analytics Pro',
-    location: 'Hà Nội',
-    type: 'Thực tập',
-    description: 'Phân tích dữ liệu và tạo báo cáo cho các dự án của công ty.',
-    requirements: 'Python/SQL, Excel nâng cao. Kiến thức về data visualization.',
-    benefits: 'Mức lương: 6-9 triệu VND/tháng. Làm việc với công cụ phân tích hiện đại.',
-  },
-  {
-    id: 9,
-    title: 'Mobile Developer (React Native)',
-    company: 'MobileWorks',
-    location: 'Hồ Chí Minh',
-    type: 'Bán thời gian',
-    description: 'Phát triển ứng dụng di động sử dụng React Native.',
-    requirements: 'React Native, JavaScript. Kinh nghiệm phát triển ứng dụng di động.',
-    benefits: 'Mức lương: 18-25 triệu VND/tháng. Cơ hội làm việc trên ứng dụng mobile thực tế.',
-  },
-  {
-    id: 10,
-    title: 'DevOps Intern',
-    company: 'InfraTech',
-    location: 'Remote',
-    type: 'Remote',
-    description: 'Hỗ trợ deployment, monitoring và scaling ứng dụng trên cloud.',
-    requirements: 'Docker, Kubernetes cơ bản. Kiến thức về AWS hoặc GCP.',
-    benefits: 'Mức lương: 12-16 triệu VND/tháng. Học DevOps từ các chuyên gia.',
-  },
 ];
+
+// Cache for job data
+let jobsCache = null;
+let cacheTime = null;
+const CACHE_DURATION = 3600000; // 1 hour in milliseconds
+
+// Fetch jobs from Remotive API
+async function fetchJobsFromRemotive() {
+  try {
+    console.log('📡 Fetching jobs from Remotive API...');
+    const response = await fetch('https://remotive.com/api/remote-jobs');
+    
+    if (!response.ok) {
+      throw new Error(`API returned status ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const jobs = data.jobs || [];
+    
+    console.log(`✅ Successfully fetched ${jobs.length} jobs from Remotive API`);
+    
+    // Transform Remotive jobs to our format
+    const transformedJobs = jobs.slice(0, 30).map((job, index) => ({
+      id: index + 1,
+      title: job.title || 'Unknown Position',
+      company: job.company_name || 'Unknown Company',
+      location: 'Remote',
+      type: 'Remote',
+      description: job.description || job.job_apply_link || 'No description available',
+      requirements: 'See job description for details',
+      benefits: job.salary || 'Salary not specified',
+    }));
+    
+    return transformedJobs;
+  } catch (error) {
+    console.error('❌ Error fetching from Remotive API:', error.message);
+    return null;
+  }
+}
+
+// Get jobs with caching
+async function getJobs() {
+  const now = Date.now();
+  
+  // Return cached data if still valid
+  if (jobsCache && cacheTime && (now - cacheTime) < CACHE_DURATION) {
+    console.log('📦 Using cached jobs data');
+    return jobsCache;
+  }
+  
+  // Fetch fresh data
+  const freshJobs = await fetchJobsFromRemotive();
+  
+  if (freshJobs && freshJobs.length > 0) {
+    jobsCache = freshJobs;
+    cacheTime = now;
+    return freshJobs;
+  }
+  
+  // Fall back to cached data if available
+  if (jobsCache) {
+    console.log('⚠️  Using previously cached data (API failed)');
+    return jobsCache;
+  }
+  
+  // Use fallback data if nothing else available
+  console.log('⚠️  Using fallback mock data');
+  return fallbackJobs;
+}
+
+// Initialize jobs on startup
+let jobs = fallbackJobs;
+(async () => {
+  jobs = await getJobs();
+})();
 
 // Route: Trang chủ
 app.get('/', (req, res) => {
@@ -141,18 +137,21 @@ app.get('/', (req, res) => {
 });
 
 // Route: Lấy tất cả công việc
-app.get('/api/jobs', (req, res) => {
+app.get('/api/jobs', async (req, res) => {
   try {
-    res.json(jobs);
+    const currentJobs = await getJobs();
+    res.json(currentJobs);
   } catch (error) {
+    console.error('Error in /api/jobs:', error);
     res.status(500).json({ error: 'Lỗi khi lấy dữ liệu công việc' });
   }
 });
 
 // Route: Lấy chi tiết một công việc theo ID
-app.get('/api/jobs/:id', (req, res) => {
+app.get('/api/jobs/:id', async (req, res) => {
   try {
-    const job = jobs.find((item) => item.id === Number(req.params.id));
+    const currentJobs = await getJobs();
+    const job = currentJobs.find((item) => item.id === Number(req.params.id));
     if (!job) {
       return res.status(404).json({ message: 'Công việc không tìm thấy' });
     }
@@ -163,10 +162,11 @@ app.get('/api/jobs/:id', (req, res) => {
 });
 
 // Route: Tìm kiếm công việc
-app.get('/api/search', (req, res) => {
+app.get('/api/search', async (req, res) => {
   try {
     const query = req.query.q || '';
-    const filtered = jobs.filter((job) => {
+    const currentJobs = await getJobs();
+    const filtered = currentJobs.filter((job) => {
       const text = `${job.title} ${job.company} ${job.description}`.toLowerCase();
       return text.includes(query.toLowerCase());
     });
@@ -177,10 +177,11 @@ app.get('/api/search', (req, res) => {
 });
 
 // Route: Lấy công việc theo địa điểm
-app.get('/api/location/:location', (req, res) => {
+app.get('/api/location/:location', async (req, res) => {
   try {
     const location = req.params.location;
-    const filtered = jobs.filter((job) => 
+    const currentJobs = await getJobs();
+    const filtered = currentJobs.filter((job) => 
       job.location.toLowerCase() === location.toLowerCase()
     );
     res.json(filtered);
@@ -190,10 +191,11 @@ app.get('/api/location/:location', (req, res) => {
 });
 
 // Route: Lấy công việc theo loại hình
-app.get('/api/type/:type', (req, res) => {
+app.get('/api/type/:type', async (req, res) => {
   try {
     const type = req.params.type;
-    const filtered = jobs.filter((job) => 
+    const currentJobs = await getJobs();
+    const filtered = currentJobs.filter((job) => 
       job.type.toLowerCase() === type.toLowerCase()
     );
     res.json(filtered);
@@ -203,9 +205,10 @@ app.get('/api/type/:type', (req, res) => {
 });
 
 // Route: Lấy danh sách các địa điểm duy nhất
-app.get('/api/locations', (req, res) => {
+app.get('/api/locations', async (req, res) => {
   try {
-    const locations = [...new Set(jobs.map((job) => job.location))];
+    const currentJobs = await getJobs();
+    const locations = [...new Set(currentJobs.map((job) => job.location))];
     res.json(locations);
   } catch (error) {
     res.status(500).json({ error: 'Lỗi khi lấy danh sách địa điểm' });
@@ -213,9 +216,10 @@ app.get('/api/locations', (req, res) => {
 });
 
 // Route: Lấy danh sách các loại hình duy nhất
-app.get('/api/types', (req, res) => {
+app.get('/api/types', async (req, res) => {
   try {
-    const types = [...new Set(jobs.map((job) => job.type))];
+    const currentJobs = await getJobs();
+    const types = [...new Set(currentJobs.map((job) => job.type))];
     res.json(types);
   } catch (error) {
     res.status(500).json({ error: 'Lỗi khi lấy danh sách loại hình' });
@@ -223,10 +227,11 @@ app.get('/api/types', (req, res) => {
 });
 
 // Route: Lọc công việc với nhiều tiêu chí
-app.post('/api/filter', (req, res) => {
+app.post('/api/filter', async (req, res) => {
   try {
     const { location, type, salary } = req.body;
-    let filtered = jobs;
+    const currentJobs = await getJobs();
+    let filtered = currentJobs;
 
     if (location) {
       filtered = filtered.filter((job) => 
@@ -252,7 +257,8 @@ app.use((req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`🚀 Server is running on http://localhost:${port}`);
-  console.log(`📊 Total jobs available: ${jobs.length}`);
+  const currentJobs = await getJobs();
+  console.log(`📊 Total jobs available: ${currentJobs.length}`);
 });
