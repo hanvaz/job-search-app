@@ -51,51 +51,72 @@ let jobsCache = null;
 let cacheTime = null;
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
-// Fetch jobs from Remotive API
-async function fetchJobsFromRemotive() {
+// Fetch jobs from JustJoinIt API
+async function fetchJobsFromJustJoinIt() {
   try {
-    console.log('📡 Fetching jobs from Remotive API...');
-    const response = await fetch('https://remotive.com/api/remote-jobs');
+    console.log('📡 Fetching jobs from JustJoinIt API...');
+    const response = await fetch('https://api.justjoinit.careers/api/offers?limit=100&offset=0');
     
     if (!response.ok) {
       throw new Error(`API returned status ${response.status}`);
     }
     
-    const data = await response.json();
-    const jobs = data.jobs || [];
+    const jobs = await response.json();
     
-    console.log(`✅ Successfully fetched ${jobs.length} jobs from Remotive API`);
+    console.log(`✅ Successfully fetched ${jobs.length} jobs from JustJoinIt API`);
     
-    // Helper function to strip HTML tags and decode entities
+    // Helper function to strip HTML tags
     const stripHTML = (html) => {
       if (!html) return 'No description available';
       return html
-        .replace(/<[^>]*>/g, '') // Remove HTML tags
-        .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
         .trim()
-        .substring(0, 500); // Limit to 500 chars
+        .substring(0, 500);
     };
     
-    // Transform Remotive jobs to our format
+    // Map JustJoinIt location to Vietnam locations
+    const mapLocation = (city) => {
+      const cityLower = (city || '').toLowerCase();
+      if (cityLower.includes('hanoi') || cityLower.includes('hà nội')) return 'Hà Nội';
+      if (cityLower.includes('ho chi minh') || cityLower.includes('hồ chí minh') || cityLower.includes('saigon')) return 'Hồ Chí Minh';
+      if (cityLower.includes('da nang') || cityLower.includes('đà nẵng')) return 'Đà Nẵng';
+      if (cityLower.includes('hanoi') || cityLower.includes('hcm') || cityLower.includes('sgn')) return 'Hà Nội';
+      return 'Remote'; // Default to Remote if not Vietnamese city
+    };
+    
+    // Map job levels to Vietnamese job types
+    const mapJobType = (experience) => {
+      if (!experience) return 'Full-time';
+      const exp = experience.toLowerCase();
+      if (exp.includes('junior') || exp.includes('trainee')) return 'Thực tập';
+      if (exp.includes('part')) return 'Bán thời gian';
+      if (exp.includes('remote')) return 'Remote';
+      return 'Full-time';
+    };
+    
+    // Transform JustJoinIt jobs to our format
     const transformedJobs = jobs.slice(0, 30).map((job, index) => ({
       id: index + 1,
       title: job.title || 'Unknown Position',
       company: job.company_name || 'Unknown Company',
-      location: 'Remote',
-      type: 'Remote',
-      description: stripHTML(job.description),
-      requirements: 'See job description for details',
-      benefits: job.salary || 'Salary not specified',
+      location: mapLocation(job.city),
+      type: mapJobType(job.experience_level),
+      description: stripHTML(job.body || job.description || ''),
+      requirements: stripHTML(job.skills?.join(', ') || 'See job description for details'),
+      benefits: job.salary_from && job.salary_to 
+        ? `${job.salary_from}-${job.salary_to} ${job.salary_currency || 'USD'}/month`
+        : 'Salary not specified',
     }));
     
-    return transformedJobs;
+    return transformedJobs.length > 0 ? transformedJobs : null;
   } catch (error) {
-    console.error('❌ Error fetching from Remotive API:', error.message);
+    console.error('❌ Error fetching from JustJoinIt API:', error.message);
     return null;
   }
 }
@@ -110,8 +131,8 @@ async function getJobs() {
     return jobsCache;
   }
   
-  // Fetch fresh data
-  const freshJobs = await fetchJobsFromRemotive();
+  // Fetch fresh data from JustJoinIt
+  const freshJobs = await fetchJobsFromJustJoinIt();
   
   if (freshJobs && freshJobs.length > 0) {
     jobsCache = freshJobs;
